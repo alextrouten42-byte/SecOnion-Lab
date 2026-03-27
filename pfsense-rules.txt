@@ -1,0 +1,45 @@
+## LAN RULES ##
+
+1. Anti-Lockout Rule (default)
+   Action: Pass
+   Source: LAN net
+   Destination: This firewall (ports 443, 80)
+   Purpose: Allows access to pfSense web GUI
+
+2. Allow LAN to Any (default)
+   Action: Pass
+   Source: LAN net
+   Destination: Any
+   Purpose: Allows outbound internet access
+
+3. Allow Elastic Agent Enrollment
+   Action: Pass
+   Source: 10.1.1.0/24
+   Destination: 192.168.0.118
+   Port: 8220
+   Purpose: Endpoint agent communication with Security Onion
+
+4. Allow Wazuh/Agent Traffic
+   Action: Pass
+   Source: 10.1.1.0/24
+   Destination: 192.168.0.118
+   Ports: 1514-1515
+   Purpose: Log forwarding / agent communication
+
+
+## WAN RULES ## 
+
+1. Allow Syslog to Security Onion
+   Action: Pass
+   Source: WAN address (pfSense)
+   Destination: 192.168.0.118
+   Port: 514 (UDP)
+   Purpose: Forward firewall logs to SIEM
+
+## OTHER ## 
+Disabled:
+- Block private networks
+- Block bogon networks
+
+Reason:
+These were preventing RFC1918 traffic (10.1.1.0/24) from reaching Security Onion.
