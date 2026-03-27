@@ -31,3 +31,6 @@ Ubuntu → pfSense → Security Onion → Alerts
 - Importance of network segmentation
 - Firewall rule troubleshooting
 - SIEM log ingestion pipeline
+- 
+## Firewall Configuration
+See `/configs/pfsense-rules.txt` for full rule set used in the lab.****
