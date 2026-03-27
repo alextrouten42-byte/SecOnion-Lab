@@ -1,0 +1,6 @@
+1. Allow Syslog to Security Onion
+   Action: Pass
+   Source: WAN address (pfSense)
+   Destination: 192.168.0.118
+   Port: 514 (UDP)
+   Purpose: Forward firewall logs to SIEM
