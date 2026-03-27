@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Home Cybersecurity Lab — Network Diagram</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117;
+    --bg2: #161b22;
+    --bg3: #1c2128;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text2: #8b949e;
+    --text3: #484f58;
+    --coral: #ff6b6b;
+    --coral-dim: rgba(255,107,107,0.12);
+    --teal: #39d0a0;
+    --teal-dim: rgba(57,208,160,0.12);
+    --purple: #a78bfa;
+    --purple-dim: rgba(167,139,250,0.12);
+    --amber: #fbbf24;
+    --amber-dim: rgba(251,191,36,0.1);
+    --gray-dim: rgba(139,148,158,0.08);
+    --font-mono: 'JetBrains Mono', monospace;
+    --font-display: 'Syne', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-mono);
+    min-height: 100vh;
+    padding: 40px 24px 60px;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  .lab-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    color: var(--teal);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-size: clamp(24px, 4vw, 40px);
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1.1;
+    margin-bottom: 10px;
+  }
+
+  .subtitle {
+    font-size: 13px;
+    color: var(--text2);
+    letter-spacing: 0.05em;
+  }
+
+  .diagram-wrap {
+    max-width: 860px;
+    margin: 0 auto;
+  }
+
+  /* ── ZONE CONTAINERS ── */
+  .zone {
+    border: 1px dashed var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    position: relative;
+    margin-bottom: 0;
+  }
+
+  .zone-label {
+    position: absolute;
+    top: -11px;
+    left: 20px;
+    background: var(--bg);
+    padding: 0 10px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text3);
+  }
+
+  /* ── NODES ── */
+  .node {
+    border-radius: 10px;
+    padding: 14px 18px;
+    border: 1px solid var(--border);
+    position: relative;
+    transition: border-color 0.2s, transform 0.15s;
+    cursor: default;
+  }
+
+  .node:hover {
+    transform: translateY(-1px);
+  }
+
+  .node-title {
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .node-sub {
+    font-size: 11px;
+    color: var(--text2);
+    line-height: 1.6;
+  }
+
+  .node-ip {
+    font-size: 11px;
+    font-weight: 600;
+    margin-top: 6px;
+    letter-spacing: 0.05em;
+  }
+
+  /* color variants */
+  .node-internet  { background: var(--gray-dim); }
+  .node-internet .node-title { color: var(--text2); }
+  .node-internet .node-ip { color: var(--text3); }
+
+  .node-pfsense   { background: var(--coral-dim); border-color: rgba(255,107,107,0.3); }
+  .node-pfsense .node-title { color: var(--coral); }
+  .node-pfsense .node-ip { color: var(--coral); }
+
+  .node-seconion  { background: var(--teal-dim); border-color: rgba(57,208,160,0.3); }
+  .node-seconion .node-title { color: var(--teal); }
+  .node-seconion .node-ip { color: var(--teal); }
+
+  .node-ubuntu    { background: var(--purple-dim); border-color: rgba(167,139,250,0.3); }
+  .node-ubuntu .node-title { color: var(--purple); }
+  .node-ubuntu .node-ip { color: var(--purple); }
+
+  .node-windows   { background: var(--amber-dim); border-color: rgba(251,191,36,0.25); }
+  .node-windows .node-title { color: var(--amber); }
+  .node-windows .node-ip { color: var(--amber); }
+
+  /* ── BADGES ── */
+  .badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 4px;
+    margin-right: 5px;
+    margin-top: 4px;
+    letter-spacing: 0.06em;
+  }
+
+  .badge-coral  { background: rgba(255,107,107,0.15); color: var(--coral); }
+  .badge-teal   { background: rgba(57,208,160,0.15);  color: var(--teal);  }
+  .badge-purple { background: rgba(167,139,250,0.15); color: var(--purple);}
+  .badge-gray   { background: rgba(139,148,158,0.12); color: var(--text2); }
+
+  /* ── ARROWS ── */
+  .arrow-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 4px 0;
+    gap: 2px;
+  }
+
+  .arrow-line {
+    width: 2px;
+    height: 28px;
+    background: var(--border);
+    position: relative;
+  }
+
+  .arrow-line::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 7px solid var(--border);
+  }
+
+  .arrow-label {
+    font-size: 10px;
+    color: var(--text3);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* colored arrows */
+  .arrow-teal .arrow-line  { background: var(--teal); }
+  .arrow-teal .arrow-line::after { border-top-color: var(--teal); }
+  .arrow-teal .arrow-label { color: var(--teal); }
+
+  .arrow-purple .arrow-line  { background: var(--purple); }
+  .arrow-purple .arrow-line::after { border-top-color: var(--purple); }
+  .arrow-purple .arrow-label { color: var(--purple); }
+
+  .arrow-amber .arrow-line  { background: var(--amber); }
+  .arrow-amber .arrow-line::after { border-top-color: var(--amber); }
+  .arrow-amber .arrow-label { color: var(--amber); }
+
+  /* ── GRID LAYOUTS ── */
+  .row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    align-items: start;
+  }
+
+  .row-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    align-items: start;
+  }
+
+  /* ── NIC TAGS inside seconion ── */
+  .nic-list {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .nic-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    padding: 5px 8px;
+    border-radius: 6px;
+    background: rgba(57,208,160,0.06);
+    border: 1px solid rgba(57,208,160,0.12);
+  }
+
+  .nic-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .nic-name { color: var(--teal); font-weight: 600; min-width: 110px; }
+  .nic-desc { color: var(--text2); }
+
+  /* ── CONNECTOR ROWS (horizontal) ── */
+  .h-connector {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin: 16px 0;
+  }
+
+  .h-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+    position: relative;
+  }
+
+  .h-label {
+    font-size: 10px;
+    color: var(--text3);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    white-space: nowrap;
+    background: var(--bg);
+  }
+
+  /* colored h-connectors */
+  .h-conn-teal .h-line   { background: rgba(57,208,160,0.4); }
+  .h-conn-teal .h-label  { color: var(--teal); border-color: rgba(57,208,160,0.3); }
+  .h-conn-purple .h-line { background: rgba(167,139,250,0.4); }
+  .h-conn-purple .h-label{ color: var(--purple); border-color: rgba(167,139,250,0.3); }
+  .h-conn-amber .h-line  { background: rgba(251,191,36,0.4); }
+  .h-conn-amber .h-label { color: var(--amber); border-color: rgba(251,191,36,0.3); }
+
+  /* ── LEGEND ── */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 40px;
+    padding: 18px 24px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--bg2);
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--text2);
+  }
+
+  .legend-line {
+    width: 28px;
+    height: 2px;
+    border-radius: 2px;
+  }
+
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center;
+    margin-top: 48px;
+    font-size: 11px;
+    color: var(--text3);
+    letter-spacing: 0.1em;
+  }
+
+  footer a {
+    color: var(--teal);
+    text-decoration: none;
+  }
+
+  @media (max-width: 600px) {
+    .row-2, .row-3 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="lab-label">// home cybersecurity lab</div>
+  <h1>Network Topology Diagram</h1>
+  <p class="subtitle">VirtualBox · pfSense · Security Onion 2.4 · Ubuntu 22.04</p>
+</header>
+
+<div class="diagram-wrap">
+
+  <!-- ── INTERNET ZONE ── -->
+  <div class="zone" style="margin-bottom:8px;">
+    <span class="zone-label">internet / home network</span>
+
+    <div class="row-2" style="align-items:center;">
+      <div class="node node-internet">
+        <div class="node-title">ISP modem + router</div>
+        <div class="node-sub">Separate modem + router setup<br>Provides DHCP to home network</div>
+        <div class="node-ip">192.168.0.1/24</div>
+      </div>
+      <div class="node node-windows">
+        <div class="node-title">Windows host machine</div>
+        <div class="node-sub">VirtualBox hypervisor<br>SOC web UI access · SSH</div>
+        <div class="node-ip">192.168.0.113</div>
+        <div style="margin-top:6px">
+          <span class="badge badge-gray">VirtualBox host</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- home net → seconion mgmt -->
+    <div class="h-connector h-conn-amber" style="margin-top:14px;">
+      <div class="h-line"></div>
+      <div class="h-label">HTTPS :443 — SOC web UI</div>
+      <div class="h-line"></div>
+    </div>
+
+    <div style="display:flex; justify-content:flex-end;">
+      <div style="width:50%; padding-left:8px;">
+        <div class="node node-seconion" style="margin-bottom:0">
+          <div class="node-title">Security Onion 2.4.201</div>
+          <div class="node-sub">Hostname: <strong>siem</strong> · Evaluation mode</div>
+          <div class="node-ip">192.168.0.118 (mgmt / Bridged)</div>
+          <div class="nic-list">
+            <div class="nic-row">
+              <div class="nic-dot" style="background:var(--amber)"></div>
+              <span class="nic-name">Adapter 1 — Bridged</span>
+              <span class="nic-desc">Management · 192.168.0.118</span>
+            </div>
+            <div class="nic-row">
+              <div class="nic-dot" style="background:var(--teal)"></div>
+              <span class="nic-name">Adapter 2 — labnet</span>
+              <span class="nic-desc">Monitor (passive capture)</span>
+            </div>
+            <div class="nic-row">
+              <div class="nic-dot" style="background:var(--purple)"></div>
+              <span class="nic-name">Adapter 3 — labnet</span>
+              <span class="nic-desc">Agent NIC · 10.1.1.13</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- arrow down to pfsense -->
+  <div class="arrow-block">
+    <div class="arrow-label">WAN · Bridged adapter</div>
+    <div class="arrow-line"></div>
+  </div>
+
+  <!-- ── PFSENSE ── -->
+  <div class="node node-pfsense" style="margin-bottom:8px;">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px;">
+      <div>
+        <div class="node-title">pfSense firewall / router</div>
+        <div class="node-sub">Routes all lab traffic · Enforces firewall rules · Forwards syslog</div>
+      </div>
+      <div style="text-align:right">
+        <span class="badge badge-coral">WAN 192.168.0.247</span>
+        <span class="badge badge-coral">LAN 10.1.1.1/24</span>
+      </div>
+    </div>
+    <div style="margin-top:10px; display:flex; flex-wrap:wrap; gap:6px;">
+      <span class="badge badge-gray">Outbound NAT auto</span>
+      <span class="badge badge-gray">DHCP server (labnet)</span>
+      <span class="badge badge-gray">Syslog → :514</span>
+      <span class="badge badge-gray">Default allow LAN</span>
+    </div>
+  </div>
+
+  <!-- syslog arrow pfSense → SecOnion (shown as label) -->
+  <div class="h-connector h-conn-teal" style="margin: 6px 0 6px 0;">
+    <div class="h-line" style="flex:0.3"></div>
+    <div class="h-label">syslog UDP 514 → 192.168.0.118 · 20,000+ events ingested</div>
+    <div class="h-line" style="flex:0.3"></div>
+  </div>
+
+  <!-- arrow down to labnet -->
+  <div class="arrow-block">
+    <div class="arrow-label">LAN · Internal Network (labnet)</div>
+    <div class="arrow-line"></div>
+  </div>
+
+  <!-- ── LABNET ZONE ── -->
+  <div class="zone">
+    <span class="zone-label">labnet — 10.1.1.0/24 · Internal Network</span>
+
+    <div class="row-2">
+      <!-- Ubuntu -->
+      <div>
+        <div class="node node-ubuntu">
+          <div class="node-title">Ubuntu 22.04 LTS</div>
+          <div class="node-sub">Endpoint VM · behind pfSense firewall<br>Default gateway: 10.1.1.1</div>
+          <div class="node-ip">10.1.1.11 (DHCP from pfSense)</div>
+          <div style="margin-top:6px">
+            <span class="badge badge-purple">Elastic Agent</span>
+            <span class="badge badge-gray">2 vCPU / 4GB RAM</span>
+          </div>
+        </div>
+
+        <!-- Elastic Agent arrow up to SecOnion -->
+        <div class="h-connector h-conn-purple" style="margin-top:12px;">
+          <div class="h-line"></div>
+          <div class="h-label">Elastic Agent TCP :8220 → 10.1.1.13</div>
+          <div class="h-line"></div>
+        </div>
+      </div>
+
+      <!-- Labnet SecOnion NIC detail -->
+      <div class="node node-seconion">
+        <div class="node-title">Security Onion</div>
+        <div class="node-sub">labnet interfaces</div>
+        <div class="nic-list">
+          <div class="nic-row">
+            <div class="nic-dot" style="background:var(--teal)"></div>
+            <span class="nic-name">Monitor (enp0s8)</span>
+            <span class="nic-desc">Passive · no IP · sees all labnet traffic</span>
+          </div>
+          <div class="nic-row">
+            <div class="nic-dot" style="background:var(--purple)"></div>
+            <span class="nic-name">Agent NIC (enp0s9)</span>
+            <span class="nic-desc">10.1.1.13 · Fleet :8220</span>
+          </div>
+        </div>
+        <div style="margin-top:10px">
+          <span class="badge badge-teal">Zeek</span>
+          <span class="badge badge-teal">Suricata</span>
+          <span class="badge badge-teal">Elastic SIEM</span>
+          <span class="badge badge-teal">Fleet</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── LEGEND ── -->
+  <div class="legend">
+    <div class="legend-item">
+      <div class="legend-dot" style="background:var(--coral)"></div>
+      pfSense firewall
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:var(--teal)"></div>
+      Security Onion SIEM
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:var(--purple)"></div>
+      Ubuntu endpoint
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:var(--amber)"></div>
+      Windows host
+    </div>
+    <div class="legend-item">
+      <div class="legend-line" style="background:var(--teal)"></div>
+      Syslog (UDP 514)
+    </div>
+    <div class="legend-item">
+      <div class="legend-line" style="background:var(--purple)"></div>
+      Elastic Agent (TCP 8220)
+    </div>
+    <div class="legend-item">
+      <div class="legend-line" style="background:var(--amber)"></div>
+      Web UI (HTTPS 443)
+    </div>
+    <div class="legend-item">
+      <div class="legend-line" style="background:var(--border)"></div>
+      Routed traffic
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <p>Home Cybersecurity Lab · Built with VirtualBox · 2026</p>
+</footer>
+
+</body>
+</html>
